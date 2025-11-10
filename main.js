@@ -64,3 +64,13 @@ async function audio_quron() {
   
   document.getElementById("readAll").addEventListener("click", audio_quron);
   
+  const inputElement = document.getElementById("inputElement");
+
+inputElement.addEventListener("change", () => {
+    audio_quron();
+});
+inputElement.addEventListener("keyup", (event) => {
+    if (event.key === "Enter") {
+        audio_quron();
+    }
+});
