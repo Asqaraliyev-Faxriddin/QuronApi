@@ -1,28 +1,32 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./styles.css">
-    <title>Qur'an</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Qur'on Tinglash</title>
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-    <div class="wrapper">
-        <div class="ads">
-            <h1>Sura: <span id="surahName"></span></h1>
-            <button class="adss" id="readAll">Qur'on to'liq eshitish.</button>
-            <h4>bir oz kuting chiqadi</h4>
-            <input id="inputElement" type="number">
-        </div>
-        <ul id="list"></ul> 
+  <div class="container">
+    <header>
+      <h1>📖 Qur'on Tinglash</h1>
+      <p>Sura tanlang va tinglang</p>
+    </header>
+
+    <div class="controls">
+      <input type="number" id="inputElement" placeholder="Surani raqamini kiriting (masalan, 1)">
+      <button id="readAll">Boshlash</button>
     </div>
 
-    <div id="audioWrapper" style="display: none"></div>
+    <div class="player" id="audioWrapper">
+      <!-- Audio player joyi -->
+    </div>
 
-    <!-- O'ng tomonda matnlar chiqadigan joy -->
-    <div id="textWrapper" style="display: flex; flex-direction: column; padding: 20px; font-size: 18px; color: white;"></div>
+    <div class="text-wrapper" id="textWrapper">
+      <!-- Oyatlar shu yerda chiqadi -->
+    </div>
+  </div>
 
-    <script src="./main.js"></script>
+  <script src="./main.js"></script>
 </body>
+</html>

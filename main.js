@@ -1,81 +1,66 @@
 async function audio_quron() {
-    let inputElement = document.getElementById("inputElement").value;
-    if (!inputElement) return;
-
-    try {
-      
-        let audioRes = await fetch(`https://api.quran.com/api/v4/chapter_recitations/1/${inputElement}`);
-
-         let audioData = await audioRes.json();
-
-
-
-
-        let arabicRes = await fetch(`https://api.quran.com/api/v4/quran/verses/uthmani?chapter_number=${inputElement}`);
-        let arabicData = await arabicRes.json();
-
-
-
-
-
-        let uzbekRes = await fetch(`https://api.quran.com/api/v4/quran/translations/131?chapter_number=${inputElement}`);
-        let uzbekData = await uzbekRes.json();
-
-      
-
-
-
-        if (!audioData.audio_file || !arabicData.verses || !uzbekData.translations) {
-            document.getElementById("textWrapper").innerHTML = "<p>Ma'lumot topilmadi.</p>";
-            return;
-        }
-
-      
-        let audioWrapper = document.querySelector("#audioWrapper");
-        audioWrapper.innerHTML = "";
-
-
-        let audio = document.createElement("audio");
-        
-        
-        audio.src = audioData.audio_file.audio_url;
-        audio.controls = true;
-        
-        
-        audio.autoplay = true;
-        audioWrapper.append(audio);
-
-      
-        let textWrapper = document.querySelector("#textWrapper");
-        textWrapper.innerHTML = "";
-        let index = 0;
-
-        audio.addEventListener("timeupdate", () => {
-        
-        
-            if (index >= arabicData.verses.length) return;
-
-        
-            let arabic = arabicData.verses[index].text_uthmani;
-            let uzbek = uzbekData.translations[index] ? uzbekData.translations[index].text : "O‘zbekcha tarjima yo‘q";
-
-            let p = document.createElement("p");
-        
-        
-        
-        
-            p.innerHTML = `<strong>${arabic}</strong> <br> ${uzbek}`;
-        
-            textWrapper.appendChild(p);
-            index++;
-        });
-
-
-    } catch (error) {
-        
-        console.error("Xato", error);
+    const suraNumber = document.getElementById("inputElement").value.trim();
+    if (!suraNumber) {
+      alert("Iltimos, sura raqamini kiriting!");
+      return;
     }
-}
+  
+    try {
+      // 1. Sura ma'lumotlari (nomi va tarjima)
+      const suraRes = await fetch(`https://api.quran.com/api/v4/chapters/${suraNumber}`);
+      const suraData = await suraRes.json();
+  
+      // Sura nomini chiqarish
+      const header = document.querySelector("header h1");
+      if (suraData.chapter) {
+        header.textContent = `📖 ${suraData.chapter.name_arabic} — ${suraData.chapter.name_simple}`;
+      }
+  
+      // 2. Audio va oyatlar
+      const [audioRes, arabicRes, uzbekRes] = await Promise.all([
+        fetch(`https://api.quran.com/api/v4/chapter_recitations/1/${suraNumber}`),
+        fetch(`https://api.quran.com/api/v4/quran/verses/uthmani?chapter_number=${suraNumber}`),
+        fetch(`https://api.quran.com/api/v4/quran/translations/131?chapter_number=${suraNumber}`)
+      ]);
+  
+      const audioData = await audioRes.json();
+      const arabicData = await arabicRes.json();
+      const uzbekData = await uzbekRes.json();
 
-
-document.querySelector("#readAll").addEventListener("click", audio_quron);
+      console.log("audioData",audioData);
+      console.log("arabicData",arabicData);
+        console.log("uzbekData",uzbekData);
+      
+  
+      // Audio pleer
+      const audioWrapper = document.getElementById("audioWrapper");
+      audioWrapper.innerHTML = "";
+      if (!audioData.audio_file) {
+        audioWrapper.innerHTML = "<p>Audio topilmadi.</p>";
+        return;
+      }
+  
+      const audio = document.createElement("audio");
+      audio.src = audioData.audio_file.audio_url;
+      audio.controls = true;
+      audioWrapper.append(audio);
+  
+      // Oyatlar va tarjimalar
+      const textWrapper = document.getElementById("textWrapper");
+      textWrapper.innerHTML = "";
+  
+      arabicData.verses.forEach((verse, i) => {
+        const uzbek = uzbekData.translations[i] ? uzbekData.translations[i].text : "O‘zbekcha tarjima yo‘q";
+        const p = document.createElement("p");
+        p.innerHTML = `<strong>${verse.text_uthmani}</strong><br>${uzbek}`;
+        textWrapper.appendChild(p);
+      });
+  
+    } catch (err) {
+      console.error(err);
+      document.getElementById("textWrapper").innerHTML = "<p>Xatolik yuz berdi. Qayta urinib ko‘ring.</p>";
+    }
+  }
+  
+  document.getElementById("readAll").addEventListener("click", audio_quron);
+  
